@@ -6,3 +6,6 @@ license = "MIT"
 description = "Library for managing soaricarus storage"
 
 [dependencies]
+aws-config = { version = "1.9.0" }
+aws-sdk-s3 = { version = "1.138.1" }
+tokio = { version = "1.53.0", features = ["full"] }
