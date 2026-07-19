@@ -1375,6 +1375,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-s3",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
