@@ -1,37 +1,37 @@
 pub mod config;
 
-
-// use aws_sdk_s3::config::*;
-
 #[derive(Default)]
 pub struct Data {
     pub filepath: String,
-    pub raw_data: Vec<u8>
+    pub raw_data: Vec<u8>,
 }
-
 
 pub struct Labyrinth {
     pub config: config::Config,
 }
 
+pub async fn load_data(filepath: &str) -> Result<Vec<u8>, std::io::Error> {
+    tokio::fs::read(filepath).await
+}
+
 pub enum Error {
     Info(String),
-    SError(aws_sdk_s3::operation::put_object::PutObjectError)
+    SError(aws_sdk_s3::operation::put_object::PutObjectError),
 }
 
 impl Labyrinth {
-    pub async fn upload(&self, file_key: &str, data: &Data) -> Result<aws_sdk_s3::operation::put_object::PutObjectOutput, Error> {
-        // let config = aws_config::from_env().endpoint_url(&self.config.url).region("").load().await;
+    pub async fn upload(
+        &self,
+        file_key: &str,
+        data: &Data,
+    ) -> Result<aws_sdk_s3::operation::put_object::PutObjectOutput, Error> {
         let config = aws_config::load_from_env().await;
         let client = aws_sdk_s3::Client::new(&config);
 
         let data_content = if data.raw_data.is_empty() {
-            match tokio::fs::read(&data.filepath).await {
+            match load_data(&data.filepath).await {
                 Ok(content) => content,
-                Err(err) => {
-                    eprintln!("Error: {err:?}");
-                    Vec::new()
-                }
+                Err(err) => return Err(Error::Info(err.to_string())),
             }
         } else {
             data.raw_data.to_owned()
@@ -45,34 +45,10 @@ impl Labyrinth {
             .key(file_key)
             .body(b_stream)
             .send()
-            .await {
-            Ok(response) => {
-                println!("Response: {response:?}");
-                println!("Uploaded");
-                
-                Ok(response)
-            }
-            Err(err) => {
-                eprintln!("Error: {err:?}");
-                // aws_sdk_s3::error::SdkError<aws_sdk_s3::operation::put_object::PutObjectError, >
-                Err(Error::Info(err.to_string()))
-            }
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(err) => Err(Error::Info(err.to_string())),
         }
-    }
-}
-
-
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
     }
 }
