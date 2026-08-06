@@ -4,5 +4,5 @@ pub struct Config {
     pub bucket: String,
     pub region: String,
     pub access_key_id: String,
-    pub secret_key: String
+    pub secret_key: String,
 }

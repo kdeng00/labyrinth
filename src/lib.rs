@@ -31,11 +31,11 @@ impl Labyrinth {
         let credentials = Credentials::new(
             self.config.access_key_id.clone(),
             self.config.secret_key.clone(),
-            None, // session_token - None for long-term credentials
-            None, // expires_after - None for long-term credentials
+            None,   // session_token - None for long-term credentials
+            None,   // expires_after - None for long-term credentials
             "maze", // provider_name - just a label
         );
-        
+
         // 2. Create region
         let region = Region::new(self.config.region.to_string());
         let config = aws_config::from_env()
