@@ -42,6 +42,7 @@ impl Labyrinth {
         let config = aws_config::from_env()
             .region(region)
             .credentials_provider(credentials)
+            .endpoint_url(self.config.url.clone())
             .load()
             .await;
 
