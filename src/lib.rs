@@ -46,8 +46,13 @@ impl Labyrinth {
             .load()
             .await;
 
+        let s3_config = aws_sdk_s3::config::Builder::from(&config)
+            .force_path_style(true) // 👈 CRITICAL for Garage/MinIO/LocalStack
+            .build();
+
         // let config = aws_config::load_from_env().await;
-        let client = aws_sdk_s3::Client::new(&config);
+        // let client = aws_sdk_s3::Client::new(&config);
+        let client = aws_sdk_s3::Client::from_conf(s3_config);
 
         let data_content = if data.raw_data.is_empty() {
             match load_data(&data.filepath).await {
