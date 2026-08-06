@@ -1,4 +1,4 @@
-#[derive(Default)]
+#[derive(Debug, Default)]
 pub struct Config {
     pub url: String,
     pub bucket: String,
