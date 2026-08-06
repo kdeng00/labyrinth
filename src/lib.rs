@@ -16,6 +16,7 @@ pub async fn load_data(filepath: &str) -> Result<Vec<u8>, std::io::Error> {
     tokio::fs::read(filepath).await
 }
 
+#[derive(Debug)]
 pub enum Error {
     Info(String),
     SError(aws_sdk_s3::operation::put_object::PutObjectError),
