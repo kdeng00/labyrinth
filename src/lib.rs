@@ -1,5 +1,7 @@
 pub mod config;
 
+use aws_sdk_s3::config::{Credentials, Region};
+
 #[derive(Default)]
 pub struct Data {
     pub filepath: String,
@@ -25,7 +27,24 @@ impl Labyrinth {
         file_key: &str,
         data: &Data,
     ) -> Result<aws_sdk_s3::operation::put_object::PutObjectOutput, Error> {
-        let config = aws_config::load_from_env().await;
+        // 1. Create credentials
+        let credentials = Credentials::new(
+            self.config.access_key_id.clone(),
+            self.config.secret_key.clone(),
+            None, // session_token - None for long-term credentials
+            None, // expires_after - None for long-term credentials
+            "maze", // provider_name - just a label
+        );
+        
+        // 2. Create region
+        let region = Region::new(self.config.region.to_string());
+        let config = aws_config::from_env()
+            .region(region)
+            .credentials_provider(credentials)
+            .load()
+            .await;
+
+        // let config = aws_config::load_from_env().await;
         let client = aws_sdk_s3::Client::new(&config);
 
         let data_content = if data.raw_data.is_empty() {
