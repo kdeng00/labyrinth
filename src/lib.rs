@@ -37,8 +37,7 @@ pub async fn init_client(config: &config::Config) -> aws_sdk_s3::Client {
         .force_path_style(true)
         .build();
 
-    let client = aws_sdk_s3::Client::from_conf(s3_config);
-    client
+    aws_sdk_s3::Client::from_conf(s3_config)
 }
 
 #[derive(Debug)]
@@ -74,6 +73,33 @@ impl Labyrinth {
             .await
         {
             Ok(response) => Ok(response),
+            Err(err) => Err(Error::Info(err.to_string())),
+        }
+    }
+
+    pub async fn download(&self, file_key: &str) -> Result<Vec<u8>, Error> {
+        let client = init_client(&self.config).await;
+
+        match client
+            .get_object()
+            .bucket(self.config.bucket.clone())
+            .key(file_key)
+            .send()
+            .await
+        {
+            Ok(response) => {
+                let body = response.body;
+
+                // Get the body as ByteStream
+                match body.collect().await {
+                    Ok(data) => {
+                        let bytes = data.into_bytes();
+                        let raw_data = bytes.to_vec();
+                        Ok(raw_data)
+                    }
+                    Err(err) => Err(Error::Info(err.to_string())),
+                }
+            }
             Err(err) => Err(Error::Info(err.to_string())),
         }
     }
