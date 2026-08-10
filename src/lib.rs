@@ -77,4 +77,31 @@ impl Labyrinth {
             Err(err) => Err(Error::Info(err.to_string())),
         }
     }
+
+    pub async fn download(&self, file_key: &str) -> Result<Vec<u8>, Error> {
+        let client = init_client(&self.config).await;
+
+        match client
+            .get_object()
+            .bucket(&self.config.bucket.clone())
+            .key(file_key)
+            .send()
+            .await
+        {
+            Ok(response) => {
+                let body = response.body;
+
+                // Get the body as ByteStream
+                match body.collect().await {
+                    Ok(data) => {
+                        let bytes = data.into_bytes();
+                        let raw_data = bytes.to_vec();
+                        Ok(raw_data)
+                    }
+                    Err(err) => Err(Error::Info(err.to_string())),
+                }
+            }
+            Err(err) => Err(Error::Info(err.to_string())),
+        }
+    }
 }
