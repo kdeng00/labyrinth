@@ -37,8 +37,7 @@ pub async fn init_client(config: &config::Config) -> aws_sdk_s3::Client {
         .force_path_style(true)
         .build();
 
-    let client = aws_sdk_s3::Client::from_conf(s3_config);
-    client
+    aws_sdk_s3::Client::from_conf(s3_config)
 }
 
 #[derive(Debug)]
@@ -83,7 +82,7 @@ impl Labyrinth {
 
         match client
             .get_object()
-            .bucket(&self.config.bucket.clone())
+            .bucket(self.config.bucket.clone())
             .key(file_key)
             .send()
             .await
