@@ -107,16 +107,21 @@ impl Labyrinth {
     }
 
     /// Delete an object from the bucket
-    pub async fn delete(&self, file_key: &str) -> Result<aws_sdk_s3::operation::delete_object::DeleteObjectOutput, Error> {
+    pub async fn delete(
+        &self,
+        file_key: &str,
+    ) -> Result<aws_sdk_s3::operation::delete_object::DeleteObjectOutput, Error> {
         let client = init_client(&self.config).await;
 
-        match client.delete_object().bucket(self.config.bucket.clone()).key(file_key).send().await {
-            Ok(response) => {
-                Ok(response)
-            }
-            Err(err) => {
-                Err(Error::Info(err.to_string()))
-            }
+        match client
+            .delete_object()
+            .bucket(self.config.bucket.clone())
+            .key(file_key)
+            .send()
+            .await
+        {
+            Ok(response) => Ok(response),
+            Err(err) => Err(Error::Info(err.to_string())),
         }
     }
 }
