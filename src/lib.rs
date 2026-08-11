@@ -47,6 +47,7 @@ pub enum Error {
 }
 
 impl Labyrinth {
+    /// Upload object to the bucket
     pub async fn upload(
         &self,
         file_key: &str,
@@ -77,6 +78,7 @@ impl Labyrinth {
         }
     }
 
+    /// Download object from the bucket
     pub async fn download(&self, file_key: &str) -> Result<Vec<u8>, Error> {
         let client = init_client(&self.config).await;
 
@@ -100,6 +102,25 @@ impl Labyrinth {
                     Err(err) => Err(Error::Info(err.to_string())),
                 }
             }
+            Err(err) => Err(Error::Info(err.to_string())),
+        }
+    }
+
+    /// Delete an object from the bucket
+    pub async fn delete(
+        &self,
+        file_key: &str,
+    ) -> Result<aws_sdk_s3::operation::delete_object::DeleteObjectOutput, Error> {
+        let client = init_client(&self.config).await;
+
+        match client
+            .delete_object()
+            .bucket(self.config.bucket.clone())
+            .key(file_key)
+            .send()
+            .await
+        {
+            Ok(response) => Ok(response),
             Err(err) => Err(Error::Info(err.to_string())),
         }
     }
