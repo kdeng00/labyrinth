@@ -52,12 +52,12 @@ impl Labyrinth {
         &self,
         file_key: &str,
         data: &Data,
-    ) -> Result<aws_sdk_s3::operation::put_object::PutObjectOutput, Error> {
+    ) -> Result<aws_sdk_s3::operation::put_object::PutObjectOutput, Box<Error>> {
         let client = init_client(&self.config).await;
         let data_content = if data.raw_data.is_empty() {
             match load_data(&data.filepath).await {
                 Ok(content) => content,
-                Err(err) => return Err(Error::Info(err.to_string())),
+                Err(err) => return Err(Box::new(Error::Info(err.to_string()))),
             }
         } else {
             data.raw_data.to_owned()
@@ -74,12 +74,12 @@ impl Labyrinth {
             .await
         {
             Ok(response) => Ok(response),
-            Err(err) => Err(Error::Info(err.to_string())),
+            Err(err) => Err(Box::new(Error::Info(err.to_string()))),
         }
     }
 
     /// Download object from the bucket
-    pub async fn download(&self, file_key: &str) -> Result<Vec<u8>, Error> {
+    pub async fn download(&self, file_key: &str) -> Result<Vec<u8>, Box<Error>> {
         let client = init_client(&self.config).await;
 
         match client
@@ -99,10 +99,10 @@ impl Labyrinth {
                         let raw_data = bytes.to_vec();
                         Ok(raw_data)
                     }
-                    Err(err) => Err(Error::Info(err.to_string())),
+                    Err(err) => Err(Box::new(Error::Info(err.to_string()))),
                 }
             }
-            Err(err) => Err(Error::Info(err.to_string())),
+            Err(err) => Err(Box::new(Error::Info(err.to_string()))),
         }
     }
 
@@ -110,7 +110,7 @@ impl Labyrinth {
     pub async fn delete(
         &self,
         file_key: &str,
-    ) -> Result<aws_sdk_s3::operation::delete_object::DeleteObjectOutput, Error> {
+    ) -> Result<aws_sdk_s3::operation::delete_object::DeleteObjectOutput, Box<Error>> {
         let client = init_client(&self.config).await;
 
         match client
@@ -121,7 +121,7 @@ impl Labyrinth {
             .await
         {
             Ok(response) => Ok(response),
-            Err(err) => Err(Error::Info(err.to_string())),
+            Err(err) => Err(Box::new(Error::Info(err.to_string()))),
         }
     }
 }
