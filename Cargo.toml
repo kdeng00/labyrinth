@@ -1,6 +1,6 @@
 [package]
 name = "labyrinth"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2024"
 license = "MIT"
 description = "Library for managing soaricarus storage"
@@ -10,4 +10,4 @@ aws-config = { version = "1.13.0", features = ["behavior-version-latest"] }
 aws-sdk-s3 = { version = "1.157.0" }
 time = "0.3.55"
 tokio = { version = "1.54.1", features = ["full"] }
-uuid = "1.27.0"
+uuid = "1.29.0"
