@@ -1,6 +1,6 @@
 pub mod config;
 
-use aws_sdk_s3::config::{Credentials, Region};
+use aws_sdk_s3::config::{Credentials, Region, RequestChecksumCalculation, ResponseChecksumValidation};
 
 #[derive(Debug, Default)]
 pub struct Data {
@@ -17,6 +17,7 @@ pub async fn load_data(filepath: &str) -> Result<Vec<u8>, std::io::Error> {
 }
 
 pub async fn init_client(config: &config::Config) -> aws_sdk_s3::Client {
+    let region = Region::new(config.region.to_string());
     let credentials = Credentials::new(
         config.access_key_id.clone(),
         config.secret_key.clone(),
@@ -25,16 +26,14 @@ pub async fn init_client(config: &config::Config) -> aws_sdk_s3::Client {
         "maze",
     );
 
-    let region = Region::new(config.region.to_string());
-    let config = aws_config::from_env()
+    let s3_config = aws_sdk_s3::config::Builder::new()
+        .behavior_version_latest()
+        .request_checksum_calculation(RequestChecksumCalculation::WhenRequired)
+        .response_checksum_validation(ResponseChecksumValidation::WhenRequired)
+        .force_path_style(true)
+        .endpoint_url(config.url.clone())
         .region(region)
         .credentials_provider(credentials)
-        .endpoint_url(config.url.clone())
-        .load()
-        .await;
-
-    let s3_config = aws_sdk_s3::config::Builder::from(&config)
-        .force_path_style(true)
         .build();
 
     aws_sdk_s3::Client::from_conf(s3_config)
