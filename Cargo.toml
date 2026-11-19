@@ -1,13 +1,13 @@
 [package]
 name = "labyrinth"
-version = "0.0.8"
+version = "0.0.9"
 edition = "2024"
 license = "MIT"
 description = "Library for managing soaricarus storage"
 
 [dependencies]
-aws-config = { version = "1.13.0", features = ["behavior-version-latest"] }
-aws-sdk-s3 = { version = "1.157.0" }
+aws-config = { version = "1.13.3", features = ["behavior-version-latest"] }
+aws-sdk-s3 = { version = "1.161.0" }
 time = "0.3.55"
 tokio = { version = "1.54.1", features = ["full"] }
-uuid = "1.29.0"
+uuid = "1.29.3"
