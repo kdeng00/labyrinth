@@ -1,6 +1,8 @@
 pub mod config;
 
-use aws_sdk_s3::config::{Credentials, Region, RequestChecksumCalculation, ResponseChecksumValidation};
+use aws_sdk_s3::config::{
+    Credentials, Region, RequestChecksumCalculation, ResponseChecksumValidation,
+};
 
 #[derive(Debug, Default)]
 pub struct Data {
